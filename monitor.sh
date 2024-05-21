@@ -3,7 +3,7 @@
 # Default Options
 UserName=$(whoami)
 Directory=$(pwd)
-Interval=5
+Interval=2
 
 # Usage Script
 Help() { 
