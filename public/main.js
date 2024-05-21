@@ -179,11 +179,9 @@ const updateRamChart = (totalRam, usedRam) => {
     ramData.push(usage);
     ramLabels.push(label);
 
-    // set data limit, remove twice on ram because of unknown bugs
+    // set data limit
     if (ramInstance.data.datasets[0].data.length >= CHART_LIMIT) {
         ramInstance.data.datasets[0].data.shift();
-        ramInstance.data.datasets[0].data.shift();
-        ramInstance.data.labels.shift();
         ramInstance.data.labels.shift();
     }
 
@@ -195,6 +193,8 @@ const updateRamChart = (totalRam, usedRam) => {
 
 const wsHost = 'ws://192.168.2.192:6969';
 const rcTimeout = 2000;
+let cpuUpdateBusy = false;
+let ramUpdateBusy = false;
 const wsConnect = () => {
 
     try {
@@ -212,18 +212,45 @@ const wsConnect = () => {
                             try {
                                 let log = JSON.parse(res);
                                 let cpu = log.sysstat.hosts[0].statistics[0]['cpu-load'];
+                                
+                                // prevent double update
                                 if (cpuInstance.length < 1) {
-                                    createCpuChart(cpu);
+                                    if (!cpuUpdateBusy) {
+                                        cpuUpdateBusy = setTimeout(() => {
+                                            createCpuChart(cpu);
+                                            clearTimeout(cpuUpdateBusy);
+                                            cpuUpdateBusy = false;
+                                        }, 500)
+                                    }
                                 } else {
-                                    updateCpuChart(cpu);
+                                    if (!cpuUpdateBusy) {
+                                        cpuUpdateBusy = setTimeout(() => {
+                                            updateCpuChart(cpu);
+                                            clearTimeout(cpuUpdateBusy);
+                                            cpuUpdateBusy = false;
+                                        }, 500)
+                                    }
                                 }
                             } catch (e) {
                                 let log = res.split(" ");
                                 if (log[0] === 'total') {
+                                    
                                     if (typeof ramInstance === 'undefined') {
-                                        createRamChart(log[7], log[8]);
+                                        if (!ramUpdateBusy) {
+                                            ramUpdateBusy = setTimeout(() => {
+                                                createRamChart(log[7], log[8]);
+                                                clearTimeout(ramUpdateBusy);
+                                                ramUpdateBusy = false;
+                                            }, 500)
+                                        }
                                     } else {
-                                        updateRamChart(log[7], log[8]);
+                                        if (!ramUpdateBusy) {
+                                            ramUpdateBusy = setTimeout(() => {
+                                                updateRamChart(log[7], log[8]);
+                                                clearTimeout(ramUpdateBusy);
+                                                ramUpdateBusy = false;
+                                            }, 500)
+                                        }
                                     }
                                 }
                             }
