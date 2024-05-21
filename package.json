@@ -1,0 +1,22 @@
+{
+  "name": "monitor.test",
+  "version": "1.0.0",
+  "description": "Simple NPM Init",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghivarra/simple-resource-monitor.git"
+  },
+  "author": "Ghivarra Senandika Rushdie",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ghivarra/simple-resource-monitor/issues"
+  },
+  "homepage": "https://github.com/ghivarra/simple-resource-monitor#readme",
+  "dependencies": {
+    "ws": "^8.17.0"
+  }
+}
