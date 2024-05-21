@@ -11,10 +11,20 @@ const wss = new WebSocketServer({ port: 6969 })
 wss.on('connection', function connection(ws) {
     ws.on('error', console.error)
 
-    // watch file
-    let watchedFilePath = __dirname + '/top.txt'
-    fs.watchFile(watchedFilePath, { persistent: true, interval: 250 }, () => {
-        fs.readFile(watchedFilePath, (err, data) => {
+    // watch cpu file
+    let cpuFilePath = __dirname + '/cpu.json'
+    let ramFilePath = __dirname + '/memory.txt'
+
+    fs.watchFile(cpuFilePath, { persistent: true, interval: 250 }, () => {
+        fs.readFile(cpuFilePath, (err, data) => {
+            if (err) throw err
+            ws.send(data)
+        })
+    })
+
+    // watch memory file
+    fs.watchFile(ramFilePath, { persistent: true, interval: 250 }, () => {
+        fs.readFile(ramFilePath, (err, data) => {
             if (err) throw err
             ws.send(data)
         })
