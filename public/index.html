@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Websocket Test</title>
+</head>
+
+<body>
+    <main id="main" role="main">Cek Console</main>
+    <script>
+
+        const wsHost = 'ws://localhost:6969';
+        const wsConnect = () => {
+            let ws = new WebSocket(wsHost);
+
+            ws.onopen = (event) => {
+                console.log('Websocket connected');
+            }
+
+            ws.onmessage = (event) => {
+                if (event.data instanceof Blob) {
+                    event.data.text()
+                        .then((res) => {
+                            console.log(JSON.parse(res))
+                        })
+                        .catch((res) => {
+                            console.log(res)
+                        })
+                } else {
+                    console.log(event.data);
+                }
+            }
+
+            ws.onclose = (event) => {
+                ws.close();
+                console.log('Connection Lost, trying to connect again...')
+                let rcInterval = setTimeout(() => {
+                    ws = wsConnect();
+                    ws.onopen = (event) => {
+                        clearInterval(rcInterval);
+                    }
+                }, 5000);
+            }
+
+            return ws;
+        }
+
+        // connect
+        let ws = wsConnect();
+
+    </script>
+</body>
+
+</html>
