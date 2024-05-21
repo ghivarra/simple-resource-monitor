@@ -15,6 +15,18 @@ wss.on('connection', function connection(ws) {
     let cpuFilePath = __dirname + '/cpu.json'
     let ramFilePath = __dirname + '/memory.txt'
 
+    // send cpu and memory file
+    fs.readFile(cpuFilePath, (err, data) => {
+        if (err) throw err
+        ws.send(data)
+    })
+
+    fs.readFile(ramFilePath, (err, data) => {
+        if (err) throw err
+        ws.send(data)
+    })
+
+    // watch cpu file
     fs.watchFile(cpuFilePath, { persistent: true, interval: 250 }, () => {
         fs.readFile(cpuFilePath, (err, data) => {
             if (err) throw err
