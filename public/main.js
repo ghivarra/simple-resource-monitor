@@ -219,28 +219,33 @@ const wsConnect = () => {
         ws.onmessage = (event) => {
             let res = event.data
             if (res.length > 0) {
-                let log = JSON.parse(res);
-                if (log.title === 'cpu') {
-                    let logData = JSON.parse(log.data);
-                    if (cpuInstance.length < 1) {
-                        createCpuChart(logData.sysstat.hosts[0].statistics[0]['cpu-load']);
-                    } else {
-                        updateCpuChart(logData.sysstat.hosts[0].statistics[0]['cpu-load']);
+                try {
+                    let log = JSON.parse(res);
+                    if (log.title === 'cpu') {
+                        let logData = JSON.parse(log.data);
+                        if (cpuInstance.length < 1) {
+                            createCpuChart(logData.sysstat.hosts[0].statistics[0]['cpu-load']);
+                        } else {
+                            updateCpuChart(logData.sysstat.hosts[0].statistics[0]['cpu-load']);
+                        }
+                    } else if (log.title === 'ram') {
+                        let logData = log.data.split(" ");
+                        if (typeof ramInstance === 'undefined') {
+                            createRamChart(logData[7], logData[8]);
+                        } else {
+                            updateRamChart(logData[7], logData[8]);
+                        }
                     }
-                } else if (log.title === 'ram') {
-                    let logData = log.data.split(" ");
-                    if (typeof ramInstance === 'undefined') {
-                        createRamChart(logData[7], logData[8]);
-                    } else {
-                        updateRamChart(logData[7], logData[8]);
-                    }
+                } catch (e) {
+                    console.warn('Failed to parse data: ' + e);
                 }
+                    
             }
         }
 
         ws.onclose = () => {
-            ws.close();
             console.log('Failed to open connection, trying to connect again...');
+            ws.close();
 
             // create
             sleep(rcTimeout).then(() => {
