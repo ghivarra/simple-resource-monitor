@@ -1,15 +1,18 @@
 "use strict";
 
+// clear local storage
+localStorage.clear();
+
 const cpuSection = document.getElementById('cpuSection');
 const ramSection = document.getElementById('ramSection');
 const CHART_LIMIT = 200;
 
-let cpuLabels = [];
-let cpuData = [];
-let cpuInstance = [];
-let ramLabels = [];
-let ramData = [];
-let ramInstance;
+var cpuLabels = [];
+var cpuData = [];
+var cpuInstance = [];
+var ramLabels = [];
+var ramData = [];
+var ramInstance;
 
 const createCpuChart = (cpu) => {
 
@@ -98,12 +101,9 @@ const updateCpuChart = (cpu) => {
         let date = new Date();
         let usage = (100 - parseFloat(cpu[i].idle)).toFixed(2);
         let label = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-        
-        // push to data array
-        cpuData[i].push(usage);
-        cpuLabels[i].push(label);
-
+ 
         // set data limit
+        //console.log('CPU: ' + cpuInstance[i].data.datasets[0].data.length);
         if (cpuInstance[i].data.datasets[0].data.length >= CHART_LIMIT) {
             cpuInstance[i].data.datasets[0].data.shift();
             cpuInstance[i].data.labels.shift();
@@ -188,12 +188,9 @@ const updateRamChart = (totalRam, usedRam) => {
     let date = new Date();
     let usage = parseFloat(usedRam / totalRam * 100).toFixed(2);
     let label = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    
-    // push to array
-    ramData.push(usage);
-    ramLabels.push(label);
 
     // set data limit
+    //console.log('RAM: ' + ramInstance.data.datasets[0].data.length);
     if (ramInstance.data.datasets[0].data.length >= CHART_LIMIT) {
         ramInstance.data.datasets[0].data.shift();
         ramInstance.data.labels.shift();
@@ -205,73 +202,38 @@ const updateRamChart = (totalRam, usedRam) => {
     ramInstance.update('none');
 }
 
-const wsHost = 'ws://192.168.2.192:6969';
+const wsHost = 'wss://monitor.test:8443';
 const rcTimeout = 2000;
-let cpuUpdateBusy = false;
-let ramUpdateBusy = false;
+var cpuUpdateBusy = 0;
+var ramUpdateBusy = 0;
 const wsConnect = () => {
 
     try {
-        let ws = new WebSocket(wsHost);
+        var ws = new WebSocket(wsHost);
 
         ws.onopen = () => {
             console.log('Websocket connected');
         };
 
         ws.onmessage = (event) => {
-            if (event.data instanceof Blob) {
-                event.data.text()
-                    .then((res) => {
-                        if (res.length > 0) {
-                            try {
-                                let log = JSON.parse(res);
-                                let cpu = log.sysstat.hosts[0].statistics[0]['cpu-load'];
-                                
-                                // prevent double update
-                                if (cpuInstance.length < 1) {
-                                    if (!cpuUpdateBusy) {
-                                        cpuUpdateBusy = setTimeout(() => {
-                                            createCpuChart(cpu);
-                                            clearTimeout(cpuUpdateBusy);
-                                            cpuUpdateBusy = false;
-                                        }, 500)
-                                    }
-                                } else {
-                                    if (!cpuUpdateBusy) {
-                                        cpuUpdateBusy = setTimeout(() => {
-                                            updateCpuChart(cpu);
-                                            clearTimeout(cpuUpdateBusy);
-                                            cpuUpdateBusy = false;
-                                        }, 500)
-                                    }
-                                }
-                            } catch (e) {
-                                let log = res.split(" ");
-                                if (log[0] === 'total') {
-                                    
-                                    if (typeof ramInstance === 'undefined') {
-                                        if (!ramUpdateBusy) {
-                                            ramUpdateBusy = setTimeout(() => {
-                                                createRamChart(log[7], log[8]);
-                                                clearTimeout(ramUpdateBusy);
-                                                ramUpdateBusy = false;
-                                            }, 500)
-                                        }
-                                    } else {
-                                        if (!ramUpdateBusy) {
-                                            ramUpdateBusy = setTimeout(() => {
-                                                updateRamChart(log[7], log[8]);
-                                                clearTimeout(ramUpdateBusy);
-                                                ramUpdateBusy = false;
-                                            }, 500)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    })
-            } else {
-                console.log(event.data);
+            let res = event.data
+            if (res.length > 0) {
+                let log = JSON.parse(res);
+                if (log.title === 'cpu') {
+                    let logData = JSON.parse(log.data);
+                    if (cpuInstance.length < 1) {
+                        createCpuChart(logData.sysstat.hosts[0].statistics[0]['cpu-load']);
+                    } else {
+                        updateCpuChart(logData.sysstat.hosts[0].statistics[0]['cpu-load']);
+                    }
+                } else if (log.title === 'ram') {
+                    let logData = log.data.split(" ");
+                    if (typeof ramInstance === 'undefined') {
+                        createRamChart(logData[7], logData[8]);
+                    } else {
+                        updateRamChart(logData[7], logData[8]);
+                    }
+                }
             }
         }
 
@@ -292,6 +254,3 @@ const wsConnect = () => {
 
 // connect
 let ws = wsConnect();
-
-// const ctx = document.getElementById('cpuChart');
-// let cpuChart = new Chart(ctx, config)
