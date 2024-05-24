@@ -1,5 +1,5 @@
 # Simple Resource Monitor
-Created by utilizing mpstat/sysstat Bash Script launched using PM2 . We also using Node, Websocket, + Chart JS
+Created by utilizing mpstat/sysstat Bash Script launched using PM2 . I also used Node, Websocket, + Chart JS
 
 # Upcoming Features
 - HTTP Authentication using GET parameter
