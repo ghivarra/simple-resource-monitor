@@ -1,11 +1,8 @@
 "use strict";
 
-// clear local storage
-localStorage.clear();
-
 const cpuSection = document.getElementById('cpuSection');
 const ramSection = document.getElementById('ramSection');
-const CHART_LIMIT = 200;
+const CHART_LIMIT = 100;
 
 var cpuLabels = [];
 var cpuData = [];
@@ -13,6 +10,12 @@ var cpuInstance = [];
 var ramLabels = [];
 var ramData = [];
 var ramInstance;
+
+const sleep = (ms) => {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+};
 
 const createCpuChart = (cpu) => {
 
@@ -103,7 +106,6 @@ const updateCpuChart = (cpu) => {
         let label = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
  
         // set data limit
-        //console.log('CPU: ' + cpuInstance[i].data.datasets[0].data.length);
         if (cpuInstance[i].data.datasets[0].data.length >= CHART_LIMIT) {
             cpuInstance[i].data.datasets[0].data.shift();
             cpuInstance[i].data.labels.shift();
@@ -190,7 +192,6 @@ const updateRamChart = (totalRam, usedRam) => {
     let label = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 
     // set data limit
-    //console.log('RAM: ' + ramInstance.data.datasets[0].data.length);
     if (ramInstance.data.datasets[0].data.length >= CHART_LIMIT) {
         ramInstance.data.datasets[0].data.shift();
         ramInstance.data.labels.shift();
@@ -241,8 +242,11 @@ const wsConnect = () => {
             ws.close();
             console.log('Failed to open connection, trying to connect again...');
 
-            // create new instance
-            ws = wsConnect();
+            // create
+            sleep(rcTimeout).then(() => {
+                ws = wsConnect();
+            });
+            
         }
 
         return ws;
