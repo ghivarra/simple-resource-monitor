@@ -16,29 +16,41 @@ wss.on('connection', function connection(ws) {
     let ramFilePath = __dirname + '/memory.txt'
 
     // send cpu and memory file
-    fs.readFile(cpuFilePath, (err, data) => {
+    fs.readFile(cpuFilePath, 'UTF-8', (err, data) => {
         if (err) throw err
-        ws.send(data)
+        ws.send(JSON.stringify({
+            title: 'cpu',
+            data: data
+        }))
     })
 
-    fs.readFile(ramFilePath, (err, data) => {
+    fs.readFile(ramFilePath, 'UTF-8', (err, data) => {
         if (err) throw err
-        ws.send(data)
+        ws.send(JSON.stringify({
+            title: 'ram',
+            data: data
+        }))
     })
 
     // watch cpu file
-    fs.watchFile(cpuFilePath, { persistent: true, interval: 250 }, () => {
-        fs.readFile(cpuFilePath, (err, data) => {
+    fs.watch(cpuFilePath, { encoding: 'UTF-8' }, () => {
+        fs.readFile(cpuFilePath, 'UTF-8', (err, data) => {
             if (err) throw err
-            ws.send(data)
+            ws.send(JSON.stringify({
+                title: 'cpu',
+                data: data
+            }))
         })
     })
 
     // watch memory file
-    fs.watchFile(ramFilePath, { persistent: true, interval: 250 }, () => {
-        fs.readFile(ramFilePath, (err, data) => {
+    fs.watch(ramFilePath, { encoding: 'UTF-8' }, () => {
+        fs.readFile(ramFilePath, 'UTF-8', (err, data) => {
             if (err) throw err
-            ws.send(data)
+            ws.send(JSON.stringify({
+                title: 'ram',
+                data: data
+            }))
         })
     })
 });
