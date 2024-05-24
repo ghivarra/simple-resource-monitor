@@ -8,6 +8,9 @@ const __dirname = path.dirname(__filename);
 
 const wss = new WebSocketServer({ port: 6969 })
 
+var cpuLastUpdate = Math.round((Date.now() / 1000))
+var ramLastUpdate = Math.round((Date.now() / 1000))
+
 wss.on('connection', function connection(ws) {
     ws.on('error', console.error)
 
@@ -20,6 +23,7 @@ wss.on('connection', function connection(ws) {
         if (err) throw err
         ws.send(JSON.stringify({
             title: 'cpu',
+            time: Math.round((Date.now() / 1000)),
             data: data
         }))
     })
@@ -28,6 +32,7 @@ wss.on('connection', function connection(ws) {
         if (err) throw err
         ws.send(JSON.stringify({
             title: 'ram',
+            time: Math.round((Date.now() / 1000)),
             data: data
         }))
     })
@@ -38,6 +43,7 @@ wss.on('connection', function connection(ws) {
             if (err) throw err
             ws.send(JSON.stringify({
                 title: 'cpu',
+                time: Math.round((Date.now() / 1000)),
                 data: data
             }))
         })
@@ -49,6 +55,7 @@ wss.on('connection', function connection(ws) {
             if (err) throw err
             ws.send(JSON.stringify({
                 title: 'ram',
+                time: Math.round((Date.now() / 1000)),
                 data: data
             }))
         })
