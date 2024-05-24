@@ -10,7 +10,7 @@ Help() {
     # Display Help
     echo "You need to use the options below to run the script"
     echo
-    echo "Syntax: [-d|h]"
+    echo "Syntax: [-d|h|i]"
     echo
     echo "options:"
     echo "-d     Your root directory for this script."
@@ -20,7 +20,8 @@ Help() {
 }
 
 # Get options
-while getopts ":hd:" option; do
+while getopts ":d:i:h:" option
+do
     case $option in
         d) # Enter Directory
             Directory=$OPTARG;;
