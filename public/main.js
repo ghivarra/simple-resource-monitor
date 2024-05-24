@@ -13,6 +13,9 @@ let ramInstance;
 
 const createCpuChart = (cpu) => {
 
+    // update card
+    document.getElementById('cpuCard').innerText = (100 - parseFloat(cpu[0].idle)).toFixed(2) + ' %';
+
     // create canvas element
     for (let i = 0; i < cpu.length; i++) {
 
@@ -85,6 +88,10 @@ const createCpuChart = (cpu) => {
 }
 
 const updateCpuChart = (cpu) => {
+
+    // update card
+    document.getElementById('cpuCard').innerText = (100 - parseFloat(cpu[0].idle)).toFixed(2) + ' %';
+
     // create canvas element
     for (let i = 0; i < cpu.length; i++) {
         // process data
@@ -110,6 +117,9 @@ const updateCpuChart = (cpu) => {
 }
 
 const createRamChart = (totalRam, usedRam) => {
+
+    // update card
+    document.getElementById('ramCard').innerText = parseFloat(usedRam / totalRam * 100).toFixed(2) + ' %';
 
     // generate id
     let canvasId = 'ramCanvas';
@@ -170,6 +180,10 @@ const createRamChart = (totalRam, usedRam) => {
 }
 
 const updateRamChart = (totalRam, usedRam) => {
+    
+    // update card
+    document.getElementById('ramCard').innerText = parseFloat(usedRam / totalRam * 100).toFixed(2) + ' %';
+
     // process data
     let date = new Date();
     let usage = parseFloat(usedRam / totalRam * 100).toFixed(2);

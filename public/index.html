@@ -19,12 +19,31 @@
 </head>
 
 <body>
+
+    <header id="header">
+        <h1 id="title">Simple Resource Monitor</h1>
+        <h6 id="subtitle">Created with &hearts; by <a href="https://github.com/ghivarra" target="_blank">Ghivarra Senandika Rushdie</a></h6>
+    </header>
+
+    <!-- MAIN -->
     <main id="main" role="main">
         <section id="cpuSection">
             <div id="allCpuContainer"></div>
             <div id="singularCpuContainer"></div>
         </section>
-        <section id="ramSection"></section>
+        <section id="rightSection">
+            <div id="ramSection"></div>
+            <div id="cardContainer">
+                <div class="card">
+                    <p class="card-title">CPU Usage</p>
+                    <h1 id="cpuCard" class="card-value cpu">0 %</h1>
+                </div>
+                <div class="card">
+                    <p class="card-title">RAM Usage</p>
+                    <h1 id="ramCard" class="card-value ram">0 %</h1>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- JS -->
